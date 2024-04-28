@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Parties</title>
+    <script type="text/javascript" src="//code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+
+<body>
+    Enter name<br>
+    <input id="name-input" type="text" size="100"><br>
+    Enter party code<br>
+    <input id="room-code-input" type="text" size="100"><br>
+    <input id="room-join" type="button" value="Join">
+    <input id="room-create" type="button" value="Create">
+
+    <script>
+        $(document).ready(function () {
+            var socket = io.connect();
+
+            socket.on('connect', function () {
+                socket.emit('all_event', {data: 'I\'m connected!'});
+            });
+            socket.on('disconnect', function () {
+                $('#log').append('<br>Disconnected');
+            });
+            socket.on('my_response', function (msg) {
+                $('#log').append(`<br>${msg.data}`);
+            });
+
+            $('#room-join').click(function () {
+                var roomCode = $('#room-code-input').val();
+                var name = $('#name-input').val();
+                socket.emit('join_room', {code: roomCode, name: name})
+            });
+
+            $('#room-create').click(function () {
+                var name = $('#name-input').val();
+                socket.emit('create_room', {name: name})
+            });
+        });
+    </script>
+    <h2>Log:</h2>
+    <div>
+        <p id="log"></p>
+    </div>
+</body>
+
+</html>
